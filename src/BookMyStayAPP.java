@@ -10,6 +10,11 @@
  *
  * @author Aanish
  * @version 6.1
+ * @version 5.1
+ * @version 4.1
+ *
+ * @author Aanish
+ * @version 3.1
  */
 
 import java.util.*;
@@ -234,6 +239,9 @@ public class BookMyStayAPP {
         System.out.println("=======================================");
         System.out.println("   Welcome to Book My Stay App!");
         System.out.println("   Hotel Booking Management System v6.1");
+        System.out.println("   Hotel Booking Management System v5.1");
+        System.out.println("   Hotel Booking Management System v4.1");
+        System.out.println("   Hotel Booking Management System v3.1");
         System.out.println("=======================================\n");
 
         // UC2: Initialize room objects
@@ -266,6 +274,24 @@ public class BookMyStayAPP {
         bookingService.processRequests(bookingQueue);
 
         // Final inventory state
+        // Search again after update
+        searchService.searchAvailableRooms(rooms);
+        single.displayRoomDetails();
+        doubleRoom.displayRoomDetails();
+        suite.displayRoomDetails();
+
+        // UC3: Centralized Inventory
+        RoomInventory inventory = new RoomInventory();
+        inventory.addRoomType(single.getRoomType(), 5);
+        inventory.addRoomType(doubleRoom.getRoomType(), 3);
+        inventory.addRoomType(suite.getRoomType(), 2);
+
+        // Display inventory
+        inventory.displayInventory();
+
+        // Example update
+        inventory.updateAvailability("Single Room", 4);
+        System.out.println("\nAfter booking one Single Room:");
         inventory.displayInventory();
     }
 }
