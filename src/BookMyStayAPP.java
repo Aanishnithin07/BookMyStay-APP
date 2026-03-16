@@ -303,7 +303,7 @@ class BookingHistory {
 
 
     public List<Reservation> getHistory() {
-        return history;
+        return Collections.unmodifiableList(history);
     }
 }
 
