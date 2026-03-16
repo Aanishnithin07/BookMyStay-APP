@@ -1,4 +1,41 @@
+import java.util.*;
+
+
 /**
+ * =====================================================
+ * MAIN CLASS - BookMyStayApp
+ * =====================================================
+ * Combines:
+ * UC1 - Application Startup
+ * UC2 - Room Domain Model
+ * UC3 - Centralized Inventory
+ * UC4 - Room Search
+ * UC5 - Booking Request Queue
+ * UC6 - Reservation Confirmation & Room Allocation
+ * UC7 - Add-On Service Selection
+ * UC8 - Booking History & Reporting
+ *
+ * @author  AANISH NITHIN A
+ * @version 8.0
+ */
+
+
+/*-------------------------------------------------------
+ABSTRACT CLASS : Room
+-------------------------------------------------------*/
+abstract class Room {
+
+
+    private final String roomType;
+    private final int beds;
+    private final int size;
+    private final double price;
+
+
+    public Room(String roomType, int beds, int size, double price) {
+        this.roomType = roomType;
+        this.beds = beds;
+        this.size = size;
  * BookMyStayAPP.java
  * UC1: Application startup and welcome message.
  * UC2: Room modeling with abstract classes, inheritance, and static availability.
@@ -32,10 +69,91 @@ abstract class Room {
         this.price = price;
     }
 
+
     public String getRoomType() {
         return roomType;
     }
 
+
+    public void displayRoomDetails() {
+        System.out.println("Room Type    : " + roomType);
+        System.out.println("Beds         : " + beds);
+        System.out.println("Room Size    : " + size + " sq.ft");
+        System.out.println("Price/Night  : ₹" + price);
+    }
+}
+
+
+/*-------------------------------------------------------
+ROOM TYPES
+-------------------------------------------------------*/
+class SingleRoom extends Room {
+    public SingleRoom() {
+        super("Single Room", 1, 200, 2000);
+    }
+}
+
+
+class DoubleRoom extends Room {
+    public DoubleRoom() {
+        super("Double Room", 2, 350, 3500);
+    }
+}
+
+
+class SuiteRoom extends Room {
+    public SuiteRoom() {
+        super("Suite Room", 3, 600, 7000);
+    }
+}
+
+
+/*-------------------------------------------------------
+ROOM INVENTORY
+-------------------------------------------------------*/
+class RoomInventory {
+
+
+    private final Map<String, Integer> inventory;
+
+
+    public RoomInventory() {
+
+
+        inventory = new HashMap<>();
+
+
+        inventory.put("Single Room", 5);
+        inventory.put("Double Room", 3);
+        inventory.put("Suite Room", 2);
+    }
+
+
+    public int getAvailability(String roomType) {
+        return inventory.getOrDefault(roomType, 0);
+    }
+
+
+    public void decrementRoom(String roomType) {
+
+
+        int count = inventory.get(roomType);
+
+
+        if (count > 0) {
+            inventory.put(roomType, count - 1);
+        }
+    }
+
+
+    public void displayInventory() {
+
+
+        System.out.println("------------- CURRENT ROOM INVENTORY -------------");
+
+
+        for (Map.Entry<String, Integer> entry : inventory.entrySet()) {
+            System.out.println(entry.getKey() + " Available : " + entry.getValue());
     public int getBeds() {
         return beds;
     }
@@ -126,8 +244,21 @@ class SearchService {
                 System.out.println("Available: "+count+"\n");
             }
         }
+
+
+        System.out.println("--------------------------------------------------");
     }
 }
+
+
+/*-------------------------------------------------------
+RESERVATION CLASS
+-------------------------------------------------------*/
+class Reservation {
+
+
+    private final String guestName;
+    private final String roomType;
 
 /// UC5: Reservation
 class Reservation {
@@ -140,6 +271,13 @@ class Reservation {
         this.roomType=roomType;
     }
 
+
+    public String getGuestName() {
+        return guestName;
+    }
+
+
+    public String getRoomType() {
     public String getGuest(){
         return guest;
     }
@@ -149,6 +287,90 @@ class Reservation {
     }
 }
 
+
+/*-------------------------------------------------------
+BOOKING HISTORY (UC8)
+-------------------------------------------------------*/
+class BookingHistory {
+
+
+    private final List<Reservation> history = new ArrayList<>();
+
+
+    public void addReservation(Reservation r) {
+        history.add(r);
+    }
+
+
+    public List<Reservation> getHistory() {
+        return history;
+    }
+}
+
+
+/*-------------------------------------------------------
+BOOKING REPORT SERVICE
+-------------------------------------------------------*/
+class BookingReportService {
+
+
+    public void generateReport(List<Reservation> reservations) {
+
+
+        System.out.println("\n=========== BOOKING HISTORY REPORT ===========");
+
+
+        Map<String,Integer> summary = new HashMap<>();
+
+
+        for(Reservation r : reservations){
+
+
+            System.out.println("Guest : " + r.getGuestName() +
+                    " | Room : " + r.getRoomType());
+
+
+            summary.put(
+                    r.getRoomType(),
+                    summary.getOrDefault(r.getRoomType(),0)+1
+            );
+        }
+
+
+        System.out.println("\n--------- BOOKING SUMMARY ---------");
+
+
+        for(Map.Entry<String,Integer> entry : summary.entrySet()){
+            System.out.println(entry.getKey()+" Booked : "+entry.getValue());
+        }
+
+
+        System.out.println("-----------------------------------");
+    }
+}
+
+
+/*-------------------------------------------------------
+BOOKING REQUEST QUEUE
+-------------------------------------------------------*/
+class BookingRequestQueue {
+
+
+    private final Queue<Reservation> queue;
+
+
+    public BookingRequestQueue() {
+        queue = new LinkedList<>();
+    }
+
+
+    public void addRequest(Reservation reservation) {
+        queue.add(reservation);
+    }
+
+
+    public Reservation getNextRequest() {
+        return queue.poll();
 /// Booking Queue
 class BookingQueue{
 
@@ -208,6 +430,87 @@ class BookingService{
     }
 }
 
+
+    public boolean isEmpty() {
+        return queue.isEmpty();
+    }
+}
+
+
+/*-------------------------------------------------------
+ROOM ALLOCATION SERVICE
+-------------------------------------------------------*/
+class RoomAllocationService {
+
+
+    private final Map<String, Set<String>> allocatedRooms;
+    private final Set<String> usedRoomIds;
+
+
+    public RoomAllocationService() {
+
+
+        allocatedRooms = new HashMap<>();
+        usedRoomIds = new HashSet<>();
+
+
+        allocatedRooms.put("Single Room", new HashSet<>());
+        allocatedRooms.put("Double Room", new HashSet<>());
+        allocatedRooms.put("Suite Room", new HashSet<>());
+    }
+
+
+    public void processBookings(
+            BookingRequestQueue queue,
+            RoomInventory inventory,
+            BookingHistory history) {
+
+
+        System.out.println("=================================================");
+        System.out.println("        PROCESSING BOOKING REQUESTS (FIFO)       ");
+        System.out.println("=================================================");
+
+
+        while (!queue.isEmpty()) {
+
+
+            Reservation request = queue.getNextRequest();
+
+
+            String roomType = request.getRoomType();
+            String guest = request.getGuestName();
+
+
+            if (inventory.getAvailability(roomType) > 0) {
+
+
+                String roomId = generateRoomId(roomType);
+
+
+                allocatedRooms.get(roomType).add(roomId);
+                usedRoomIds.add(roomId);
+
+
+                inventory.decrementRoom(roomType);
+
+
+                System.out.println("Reservation Confirmed");
+                System.out.println("Guest  : " + guest);
+                System.out.println("Room   : " + roomType);
+                System.out.println("RoomID : " + roomId);
+                System.out.println("---------------------------------------");
+
+
+                /* UC8 - Store booking in history */
+                history.addReservation(request);
+
+
+            } else {
+
+
+                System.out.println("Reservation Failed (No Rooms Available)");
+                System.out.println("Guest : " + guest);
+                System.out.println("---------------------------------------");
 /// UC7: Add-on Service
 class Service{
 
@@ -249,6 +552,101 @@ class AddOnManager{
                 total+=s.price;
             }
         }
+
+
+    private String generateRoomId(String roomType) {
+
+
+        String prefix = roomType.replace(" ", "").substring(0,2).toUpperCase();
+        String roomId;
+
+
+        do {
+            roomId = prefix + (int)(Math.random() * 1000);
+        }
+        while (usedRoomIds.contains(roomId));
+
+
+        return roomId;
+    }
+}
+
+
+/*-------------------------------------------------------
+ADD ON SERVICE (UC7)
+-------------------------------------------------------*/
+record AddOnService(String serviceName, double cost) {
+
+
+}
+
+
+/*-------------------------------------------------------
+ADD ON SERVICE MANAGER
+-------------------------------------------------------*/
+class AddOnServiceManager{
+
+
+    private final Map<String,List<AddOnService>> services=new HashMap<>();
+
+
+    public void addService(String reservationId,AddOnService service){
+
+
+        services
+                .computeIfAbsent(reservationId,k->new ArrayList<>())
+                .add(service);
+    }
+
+
+    public void displayServices(String reservationId){
+
+
+        List<AddOnService> list=services.get(reservationId);
+
+
+        if(list==null){
+            System.out.println("No Add-On Services Selected");
+            return;
+        }
+
+
+        double total=0;
+
+
+        System.out.println("\nAdd-On Services for "+reservationId);
+
+
+        for(AddOnService s:list){
+
+
+            System.out.println(s.serviceName()+" : ₹"+s.cost());
+            total+=s.cost();
+        }
+
+
+        System.out.println("Total Add-On Cost : ₹"+total);
+    }
+}
+
+
+/*-------------------------------------------------------
+MAIN APPLICATION
+-------------------------------------------------------*/
+public class BookMyStayApp {
+
+
+    public static void main(String[] args) {
+
+
+        System.out.println("=================================================");
+        System.out.println("                BOOK MY STAY APP                 ");
+        System.out.println("=================================================");
+        System.out.println("                 Version : 8.0                   ");
+        System.out.println("    Status  : Application Started Successfully   ");
+        System.out.println();
+        System.out.println("=================================================");
+
 
         System.out.println("Extra Cost: ₹"+total);
     }
@@ -327,27 +725,23 @@ public class BookMyStayAPP{
 
         // UC3: Centralized Inventory
         RoomInventory inventory = new RoomInventory();
-        inventory.addRoomType(single.getRoomType(), 2);
-        inventory.addRoomType(doubleRoom.getRoomType(), 1);
-        inventory.addRoomType(suite.getRoomType(), 0); // Suite fully booked
-        inventory.displayInventory();
+        BookingRequestQueue queue = new BookingRequestQueue();
+        BookingHistory history = new BookingHistory();
 
-        // UC4: Room Search (Read-only)
-        SearchService searchService = new SearchService(inventory);
-        searchService.searchAvailableRooms(rooms);
 
-        // UC5: Booking Request Queue
-        BookingRequestQueue bookingQueue = new BookingRequestQueue();
-        bookingQueue.addRequest(new Reservation("Alice", "Single Room"));
-        bookingQueue.addRequest(new Reservation("Bob", "Double Room"));
-        bookingQueue.addRequest(new Reservation("Charlie", "Suite Room"));
-        bookingQueue.addRequest(new Reservation("Diana", "Single Room"));
-        bookingQueue.displayQueue();
+        queue.addRequest(new Reservation("Ajay", "Single Room"));
+        queue.addRequest(new Reservation("Rahul", "Double Room"));
+        queue.addRequest(new Reservation("Priya", "Suite Room"));
+        queue.addRequest(new Reservation("Arun", "Single Room"));
 
-        // UC6: Process requests and confirm reservations
-        BookingService bookingService = new BookingService(inventory);
-        bookingService.processRequests(bookingQueue);
 
+        RoomAllocationService allocationService = new RoomAllocationService();
+
+
+        allocationService.processBookings(queue, inventory, history);
+
+
+        System.out.println();
         // Final inventory state
         // Search again after update
         searchService.searchAvailableRooms(rooms);
@@ -368,5 +762,29 @@ public class BookMyStayAPP{
         inventory.updateAvailability("Single Room", 4);
         System.out.println("\nAfter booking one Single Room:");
         inventory.displayInventory();
+
+
+        /* UC7 Add On Services */
+
+
+        AddOnServiceManager serviceManager = new AddOnServiceManager();
+
+
+        serviceManager.addService("RES101",new AddOnService("Breakfast",500));
+        serviceManager.addService("RES101",new AddOnService("Airport Pickup",1200));
+        serviceManager.addService("RES101",new AddOnService("Spa",2000));
+
+
+        serviceManager.displayServices("RES101");
+
+
+        /* UC8 Booking Report */
+
+
+        BookingReportService reportService = new BookingReportService();
+
+
+        reportService.generateReport(history.getHistory());
     }
 }
+
