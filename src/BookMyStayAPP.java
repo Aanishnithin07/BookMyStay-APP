@@ -137,7 +137,7 @@ class RoomInventory {
     public void decrementRoom(String roomType) {
 
 
-        int count = inventory.get(roomType);
+        int count = inventory.getOrDefault(roomType, 0);
 
 
         if (count > 0) {
