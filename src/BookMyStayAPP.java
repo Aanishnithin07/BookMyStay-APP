@@ -558,16 +558,10 @@ class AddOnManager{
 
 
         String prefix = roomType.replace(" ", "").substring(0,2).toUpperCase();
-        String roomId;
+        String uniquePart = UUID.randomUUID().toString().replace("-", "").substring(0, 8).toUpperCase();
 
 
-        do {
-            roomId = prefix + (int)(Math.random() * 1000);
-        }
-        while (usedRoomIds.contains(roomId));
-
-
-        return roomId;
+        return prefix + uniquePart;
     }
 }
 
