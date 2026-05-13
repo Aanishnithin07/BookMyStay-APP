@@ -633,7 +633,7 @@ class AddOnServiceManager{
 /*-------------------------------------------------------
 MAIN APPLICATION
 -------------------------------------------------------*/
-public class BookMyStayApp {
+public class BookMyStayAPP {
 
 
     public static void main(String[] args) {
