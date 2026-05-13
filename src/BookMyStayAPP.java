@@ -764,12 +764,14 @@ public class BookMyStayAPP{
         AddOnServiceManager serviceManager = new AddOnServiceManager();
 
 
-        serviceManager.addService("RES101",new AddOnService("Breakfast",500));
-        serviceManager.addService("RES101",new AddOnService("Airport Pickup",1200));
-        serviceManager.addService("RES101",new AddOnService("Spa",2000));
+        // Use an actual booking-related identifier (e.g., customer name) instead of a hardcoded, unused reservation ID.
+        String addOnKey = "Ajay";
+        serviceManager.addService(addOnKey, new AddOnService("Breakfast", 500));
+        serviceManager.addService(addOnKey, new AddOnService("Airport Pickup", 1200));
+        serviceManager.addService(addOnKey, new AddOnService("Spa", 2000));
 
 
-        serviceManager.displayServices("RES101");
+        serviceManager.displayServices(addOnKey);
 
 
         /* UC8 Booking Report */
