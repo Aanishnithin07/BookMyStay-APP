@@ -276,7 +276,7 @@ class RoomAllocationService{
 
                 String roomId=generateRoomId(request.getRoomType());
 
-                allocatedRooms.get(request.getRoomType()).add(roomId);
+                allocatedRooms.computeIfAbsent(request.getRoomType(), k -> new ArrayList<>()).add(roomId);
 
                 inventory.decrementRoom(request.getRoomType());
 
