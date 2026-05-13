@@ -206,6 +206,9 @@ class BookingRequestQueue{
     }
 
     public void addRequest(Reservation reservation){
+        if (reservation == null) {
+            throw new IllegalArgumentException("Reservation cannot be null");
+        }
         queue.add(reservation);
     }
 
@@ -225,6 +228,10 @@ class BookingValidator{
 
     public static void validate(Reservation r,RoomInventory inventory)
             throws InvalidBookingException{
+
+        if (r == null) {
+            throw new InvalidBookingException("Reservation cannot be null");
+        }
 
         if(r.getGuestName()==null||r.getGuestName().isEmpty())
             throw new InvalidBookingException("Guest name cannot be empty");
